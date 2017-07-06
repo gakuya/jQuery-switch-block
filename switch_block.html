@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>要素の表示・非表示切り替え</title>
+    <style type="text/css">
+        .block {
+            border: 1px solid #000;
+            padding: 1em;
+            margin-bottom: 1em;
+        }
+        
+        .displaynone {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="js--switch-block--wrap">
+        <div class="block js--switch-block" data-block="1">
+            ブロックA
+        </div>
+        <div class="block js--switch-block" data-block="2" style="display: none">
+            ブロックB
+        </div>
+        <div class="block js--switch-block" data-block="3" style="display: none">
+            ブロックC
+        </div>
+
+        <p>
+            <input type="radio" name="radio1" value="1" data-block="1" class="js--switch-block--trigger" checked>ブロックAを表示
+            <input type="radio" name="radio1" value="2" data-block="2" class="js--switch-block--trigger" style="margin-left: 2em">ブロックBを表示
+            <input type="radio" name="radio1" value="3" data-block="3" class="js--switch-block--trigger" style="margin-left: 2em">ブロックCを表示
+        </p>
+    </div>
+    <div class="js--switch-block--wrap">
+        <div class="block js--switch-block" data-block="1" style="display: none">
+            ブロックD
+        </div>
+        <div class="block js--switch-block" data-block="2" style="display: none">
+            ブロックE
+        </div>
+        <div class="block js--switch-block" data-block="3" style="display: none">
+            ブロックF
+        </div>
+
+        <p>
+            <input type="checkbox" name="checkbox1" value="1" data-block="1" class="js--switch-block--trigger">ブロックDを表示
+            <input type="checkbox" name="checkbox1" value="2" data-block="2" class="js--switch-block--trigger" style="margin-left: 2em">ブロックEを表示
+            <input type="checkbox" name="checkbox1" value="3" data-block="3" class="js--switch-block--trigger" style="margin-left: 2em">ブロックFを表示
+        </p>
+    </div>
+    <div class="js--switch-block--wrap">
+        <div class="block js--switch-block" data-block="1">
+            ブロックG
+        </div>
+        <div class="block js--switch-block" data-block="2" style="display: none">
+            ブロックH
+        </div>
+        <div class="block js--switch-block" data-block="3" style="display: none">
+            ブロックI
+        </div>
+
+        <select name="select1" class="js--switch-block--trigger">
+            <option data-block="1" selected>ブロックGを表示</option>
+            <option data-block="2">ブロックHを表示</option>
+            <option data-block="3">ブロックIを表示</option>
+        </select>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <script>
+        $(function() {
+            $(".js--switch-block--trigger").change(function() {
+                // 表示を切り替えるブロックの範囲を取得
+                var wrap = $(this).closest('.js--switch-block--wrap');
+                // 表示を切り替えるブロックを取得
+                var lines = wrap.find('.js--switch-block');
+
+                // <input type="radio"> の場合
+                if ($(this)[0].tagName === 'INPUT' && $(this).attr('type') === 'radio') {
+                    // 表示するブロックを取得
+                    var target = $(this).data('block');
+
+                    for (var i = 0; i < lines.length; i++) {
+                        if ($(lines[i]).data('block') === target) {
+                            $(lines[i]).fadeIn('slow');
+                        } else {
+                            $(lines[i]).hide();
+                        }
+                    }
+                    // <input type="checkbox"> の場合
+                } else if ($(this)[0].tagName === 'INPUT' && $(this).attr('type') === 'checkbox') {
+                    // 表示の切り替えをするブロックを取得
+                    var target = $(this).data('block');
+
+                    for (var i = 0; i < lines.length; i++) {
+                        if ($(lines[i]).data('block') === target) {
+                            // 対象ブロックのチェック状態で表示を切り替え
+                            if ($(this).prop('checked')) {
+                                $(lines[i]).fadeIn('slow');
+                            } else {
+                                $(lines[i]).hide();
+                            }
+                        }
+                    }
+                    // <select> の場合(multiple 対応)
+                } else if ($(this)[0].tagName === 'SELECT') {
+                    // 表示切り替え用関数
+                    blockToggle = (function(lines, target, toggle) {
+                        console.log(target + ':' + toggle)
+                        for (var i = 0; i < lines.length; i++) {
+                            if ($(lines[i]).data('block') === target) {
+                                if (toggle === 'fadein_slow') {
+                                    $(lines[i]).fadeIn('slow');
+                                } else if (toggle === 'hide') {
+                                    $(lines[i]).hide();
+                                }
+                            }
+                        }
+                    });
+
+                    // 選択された項目の処理
+                    $(this).find('option:selected').each(function() {
+                        target = $(this).data('block');
+                        blockToggle(lines, target, 'fadein_slow');
+                    });
+
+                    // 選択されていない項目の処理
+                    $(this).find('option:not(:selected)').each(function() {
+                        target = $(this).data('block');
+                        blockToggle(lines, target, 'hide');
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
